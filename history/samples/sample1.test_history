@@ -1,0 +1,28 @@
+: 1575914366:0;ls
+: 1575914394:0;echo "Store this | ./bottle-cli -s 127.0.0.1:14999\
+\
+"
+: 1575914405:0;echo "Store this" | ./bottle-cli -s 127.0.0.1:14999
+: 1575914447:0;./bottle-cli -m drain 
+: 1575914462:0;./bottle-cli -m drain -s 127.0.0.1:14999
+: 1575914472:0;ls
+: 1575914475:0;cd ..
+: 1575914475:0;ls
+: 1575914477:0;git status
+: 1575914479:0;git add .
+: 1575914482:0;git status
+: 1575914495:0;git commit -m "Refactor bottle cli"
+: 1575914497:0;git push
+: 1575991089:0;git status
+: 1575991090:0;git add .
+: 1575991092:0;git status
+: 1575991098:0;git commit -m "Added lising"
+: 1575991100:0;git push
+: 1575997959:0;ls
+: 1575997963:0;cd Workspace
+: 1575997963:0;ls
+: 1575997967:0;cd Personal/bottle
+: 1575997967:0;ls
+: 1575997968:0;git status
+: 1575997970:0;git push
+: 1575998574:0;ls
