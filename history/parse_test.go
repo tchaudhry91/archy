@@ -51,7 +51,7 @@ func TestParseFile(t *testing.T) {
 		t.Errorf("Failed to gather sample files: %v", err)
 	}
 	for _, f := range files {
-		ee, err := history.ParseFile(f)
+		ee, err := history.ParseFile(f, "test")
 		if err != nil {
 			t.Errorf("Failed to parse sample file:%s because %v", f, err)
 		}

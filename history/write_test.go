@@ -11,11 +11,11 @@ import (
 )
 
 func getSampleEntries() ([]history.Entry, error) {
-	return history.ParseFile("samples/sample1.test_history")
+	return history.ParseFile("samples/sample1.test_history", "test")
 }
 
 func getSampleEntries2() ([]history.Entry, error) {
-	return history.ParseFile("samples/sample2.test_history")
+	return history.ParseFile("samples/sample2.test_history", "test2")
 }
 
 func getFileHash(fname string) (string, error) {

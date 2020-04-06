@@ -9,7 +9,7 @@ import (
 )
 
 // ParseFile returns Entry objects from a given zsh_history file
-func ParseFile(location string) ([]Entry, error) {
+func ParseFile(location string, machine string) ([]Entry, error) {
 	var errRet error
 	ee := []Entry{}
 	f, err := os.Open(location)
@@ -27,6 +27,7 @@ func ParseFile(location string) ([]Entry, error) {
 			errRet = err
 			continue
 		}
+		entry.Machine = machine
 		ee = append(ee, entry)
 	}
 	return ee, errRet
