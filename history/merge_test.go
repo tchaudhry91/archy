@@ -21,6 +21,5 @@ func TestMergeEntries(t *testing.T) {
 	if len(combined) != (len(entries1) + len(entries2)) {
 		t.Errorf("Incorrect Merge Length, Want:%d, Have:%d", (len(entries1) + len(entries2)), len(combined))
 	}
-	t.Log(combined)
 	t.Logf("Merged into total %d entries", len(combined))
 }
