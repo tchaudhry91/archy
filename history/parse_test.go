@@ -17,10 +17,10 @@ func TestParseLine(t *testing.T) {
 	}
 
 	cases := []TestCase{
-		TestCase{"Good", ": 1575991023:0;ls", "ls", 1575991023, true},
-		TestCase{"BadTimestamp", ": i1575991023:0;ls", "ls", 1575991023, false},
-		TestCase{"BadLine", ":", "ls", 1575991023, false},
-		TestCase{"BadLine2", ";", "ls", 1575991023, false},
+		{"Good", ": 1575991023:0;ls", "ls", 1575991023, true},
+		{"BadTimestamp", ": i1575991023:0;ls", "ls", 1575991023, false},
+		{"BadLine", ":", "ls", 1575991023, false},
+		{"BadLine2", ";", "ls", 1575991023, false},
 	}
 
 	for _, c := range cases {
