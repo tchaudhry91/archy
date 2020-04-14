@@ -1,7 +1,6 @@
 package store
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/tchaudhry91/zsh-archaeologist/history"
@@ -65,7 +64,7 @@ func (s *MongoStore) GetEntries(ctx context.Context, user string, filter bson.D)
 }
 
 // StoreEntries Stores the entries to the mongo store for the given user
-func (s *MongoStore) StoreEntries(ctx context.Context, user string, entries []history.Entry) error {
+func (s *MongoStore) StoreEntries(ctx context.Context, user string, entries []history.Entry) (changed int64, err error) {
 	coll := s.client.Database(database).Collection(collection)
 
 	models := []mongo.WriteModel{}
@@ -78,10 +77,7 @@ func (s *MongoStore) StoreEntries(ctx context.Context, user string, entries []hi
 
 	res, err := coll.BulkWrite(ctx, models, opts)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	fmt.Println(res.InsertedCount)
-	fmt.Println(res.UpsertedCount)
-	fmt.Println(res.ModifiedCount)
-	return nil
+	return (res.InsertedCount + res.UpsertedCount + res.ModifiedCount), nil
 }
