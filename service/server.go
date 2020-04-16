@@ -79,7 +79,7 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 		user := "tchaudhry"
 
 		r := Request{
-			Start: uint64(time.Now().AddDate(0, 0, 7).Unix()),
+			Start: uint64(time.Now().AddDate(0, 0, -7).Unix()),
 			End:   uint64(time.Now().Unix()),
 			Limit: 100,
 		}
@@ -89,6 +89,7 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 			start, err := strconv.Atoi(startS[0])
 			if err != nil {
 				s.respond(w, req, nil, http.StatusBadGateway)
+				return
 			}
 			r.Start = uint64(start)
 		}
@@ -96,6 +97,7 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 			end, err := strconv.Atoi(endS[0])
 			if err != nil {
 				s.respond(w, req, nil, http.StatusBadGateway)
+				return
 			}
 			r.End = uint64(end)
 		}
@@ -103,6 +105,7 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 			limit, err := strconv.Atoi(limitS[0])
 			if err != nil {
 				s.respond(w, req, nil, http.StatusBadGateway)
+				return
 			}
 			r.Limit = int64(limit)
 		}
@@ -111,8 +114,10 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 		entries, err := s.db.GetEntries(req.Context(), user, store.SelectTimerangeFilter(r.Start, r.End), r.Limit)
 		if err != nil {
 			s.respond(w, req, Response{Err: err.Error()}, http.StatusInternalServerError)
+			return
 		}
 		s.respond(w, req, Response{Entries: entries}, http.StatusOK)
+		return
 	}
 }
 
@@ -135,8 +140,10 @@ func (s *Server) handlePutEntries() http.HandlerFunc {
 		changed, err := s.db.StoreEntries(req.Context(), user, r.Entries)
 		if err != nil {
 			s.respond(w, req, Response{Err: err.Error()}, http.StatusInternalServerError)
+			return
 		}
 
-		s.respond(w, req, Response{Updated: changed, Err: err.Error()}, http.StatusOK)
+		s.respond(w, req, Response{Updated: changed}, http.StatusOK)
+		return
 	}
 }
