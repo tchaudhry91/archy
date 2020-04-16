@@ -7,6 +7,9 @@ tasks:
     cmds:
       - mkdir release || true
       - GOARCH=amd64 GOOS=windows go build -o release/archy.exe
-      - GOARCH=amd64 GOOS=linux go build -o release/archy-linux
+      - GOARCH=amd64 GOOS=linux go build -o release/archy
       - GOARCH=amd64 GOOS=darwin go build -o release/archy-darwin
+      - GOARCH=amd64 GOOD=linux go build -o release/archy-svc ./cmd/server
+      - GOARCH=amd64 GOOD=windows go build -o release/archy-svc.exe ./cmd/server
+      - GOARCH=amd64 GOOD=darwin go build -o release/archy-svc-darwin ./cmd/server
     silent: true

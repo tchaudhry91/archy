@@ -40,10 +40,10 @@ func NewMongoStore(uri string) (ms *MongoStore, err error) {
 }
 
 // GetEntries is used to obtain entries based on filters
-func (s *MongoStore) GetEntries(ctx context.Context, user string, filter bson.D) ([]history.Entry, error) {
+func (s *MongoStore) GetEntries(ctx context.Context, user string, filter bson.D, limit int64) ([]history.Entry, error) {
 	entries := []history.Entry{}
 	coll := s.client.Database(database).Collection(collection)
-	cur, err := coll.Find(ctx, AndMergeFilters(filter, SelectForUserFilter(user)))
+	cur, err := coll.Find(ctx, AndMergeFilters(filter, SelectForUserFilter(user)), options.Find().SetLimit(limit).SetSort(bson.D{{Key: "entry.timestamp", Value: -1}}))
 	defer cur.Close(ctx)
 	if err != nil {
 		return entries, err
