@@ -21,7 +21,7 @@ var remoteCmd = &cobra.Command{
 			panic(err)
 		}
 
-		c, err := client.NewHistoryClient(remoteAddr, "willbeatoken", 30)
+		c, err := client.NewHistoryClient(remoteAddr, "willbeatoken", 100)
 		if err != nil {
 			panic(err)
 		}
