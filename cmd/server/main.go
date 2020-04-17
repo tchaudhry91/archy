@@ -20,8 +20,9 @@ import (
 func main() {
 	fs := flag.NewFlagSet("archy-svc", flag.ExitOnError)
 	var (
-		bindAddr = fs.String("bind-addr", "127.0.0.1:15999", "Address to bind on")
-		dbConn   = fs.String("db-conn", "", "MongoDB connection String")
+		bindAddr      = fs.String("bind-addr", "127.0.0.1:15999", "Address to bind on")
+		dbConn        = fs.String("db-conn", "", "MongoDB connection String")
+		signingSecret = fs.String("signing-secret", "", "Secret to sign tokens with")
 	)
 	err := ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("ARCHY_SERVICE"))
 	if err != nil {
@@ -43,7 +44,7 @@ func main() {
 	}
 
 	// Service
-	svc := service.NewServer(db, logger, mux.NewRouter(), *bindAddr)
+	svc := service.NewServer(db, logger, mux.NewRouter(), *bindAddr, *signingSecret)
 
 	shutdown := make(chan error, 1)
 	interrupt := make(chan os.Signal, 1)

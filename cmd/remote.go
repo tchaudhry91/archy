@@ -21,7 +21,7 @@ var remoteCmd = &cobra.Command{
 			panic(err)
 		}
 
-		c, err := client.NewHistoryClient(remoteAddr, "willbeatoken", 100)
+		c, err := client.NewHistoryClient(remoteAddr, token, 100)
 		if err != nil {
 			panic(err)
 		}
@@ -32,7 +32,8 @@ var remoteCmd = &cobra.Command{
 
 		updated, err := c.PutEntries(req)
 		if err != nil {
-			panic(err)
+			fmt.Printf("Could not update entries: %v", err)
+			return
 		}
 		fmt.Printf("Succesfully Updated %d Entries\nm", updated)
 	},

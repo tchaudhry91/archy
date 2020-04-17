@@ -24,6 +24,7 @@ func (c *HistoryClient) PutEntries(req PutEntriesRequest) (updated int64, err er
 	if err != nil {
 		return 0, err
 	}
+	c.attachHeaders(r)
 
 	// Make the request
 	resp, err := c.client.Do(r)
@@ -31,6 +32,9 @@ func (c *HistoryClient) PutEntries(req PutEntriesRequest) (updated int64, err er
 		return 0, err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return 0, errors.Errorf("Failed with status:%d", resp.StatusCode)
+	}
 	response := PutEntriesResponse{}
 	err = decodeResponse(resp.Body, &response)
 	if err != nil {

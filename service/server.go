@@ -19,14 +19,15 @@ import (
 
 // Server is the base struct for the HTTP history service
 type Server struct {
-	db     *store.MongoStore
-	logger log.Logger
-	router *mux.Router
-	httpS  http.Server
+	db            *store.MongoStore
+	logger        log.Logger
+	router        *mux.Router
+	signingSecret []byte
+	httpS         http.Server
 }
 
 // NewServer returns a new ZSH History handling service
-func NewServer(db *store.MongoStore, logger log.Logger, router *mux.Router, bindAddr string) *Server {
+func NewServer(db *store.MongoStore, logger log.Logger, router *mux.Router, bindAddr, signingSecret string) *Server {
 	s := &Server{
 		db:     db,
 		logger: logger,
@@ -35,6 +36,7 @@ func NewServer(db *store.MongoStore, logger log.Logger, router *mux.Router, bind
 			Addr:    bindAddr,
 			Handler: router,
 		},
+		signingSecret: []byte(signingSecret),
 	}
 	s.routes()
 	return s
