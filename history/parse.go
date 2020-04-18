@@ -27,6 +27,9 @@ func ParseFile(location string, machine string) ([]Entry, error) {
 			errRet = err
 			continue
 		}
+		if !verifyEntrySanity(entry) {
+			continue
+		}
 		entry.Machine = machine
 		ee = append(ee, entry)
 	}
@@ -56,6 +59,13 @@ func ParseLine(line string) (Entry, error) {
 		Timestamp: timestamp,
 		Command:   command,
 	}, nil
+}
+
+func verifyEntrySanity(e Entry) bool {
+	if e.Command == "" || e.Timestamp == 0 {
+		return false
+	}
+	return true
 }
 
 // zshEntrySplitFunc splits files on every zsh entry

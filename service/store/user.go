@@ -4,8 +4,8 @@ import "golang.org/x/crypto/bcrypt"
 
 // User is a struct to hold basic login information
 type User struct {
-	User     string
-	Password string
+	User     string `bson:"user,omitempty"`
+	Password string `bson:"password,omitempty"`
 }
 
 // NewUser returns a user with hashed password

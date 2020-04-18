@@ -1,6 +1,7 @@
 package store
 
 import (
+	"errors"
 	"time"
 
 	"github.com/tchaudhry91/zsh-archaeologist/history"
@@ -38,12 +39,7 @@ func NewMongoStore(uri string) (ms *MongoStore, err error) {
 	}
 
 	st := &MongoStore{client}
-	err = st.EnsureHistoryIndices(ctx, false)
-	if err != nil {
-		return st, err
-	}
-
-	err = st.EnsureUserIndices(ctx, false)
+	err = st.EnsureUserIndices(ctx, true)
 	if err != nil {
 		return st, err
 	}
@@ -55,6 +51,10 @@ func NewMongoStore(uri string) (ms *MongoStore, err error) {
 func (s *MongoStore) GetEntries(ctx context.Context, user string, filter bson.D, limit int64) ([]history.Entry, error) {
 	entries := []history.Entry{}
 	coll := s.client.Database(database).Collection(collection)
+	if coll == nil {
+		return nil, errors.New("Could not get collection")
+	}
+
 	cur, err := coll.Find(ctx, AndMergeFilters(filter, SelectForUserFilter(user)), options.Find().SetLimit(limit).SetSort(bson.D{{Key: "entry.timestamp", Value: -1}}))
 	defer cur.Close(ctx)
 	if err != nil {
@@ -78,6 +78,9 @@ func (s *MongoStore) GetEntries(ctx context.Context, user string, filter bson.D,
 // StoreEntries Stores the entries to the mongo store for the given user
 func (s *MongoStore) StoreEntries(ctx context.Context, user string, entries []history.Entry) (changed int64, err error) {
 	coll := s.client.Database(database).Collection(collection)
+	if coll == nil {
+		return 0, errors.New("Could not get collection")
+	}
 
 	models := []mongo.WriteModel{}
 	for _, e := range entries {
@@ -89,7 +92,7 @@ func (s *MongoStore) StoreEntries(ctx context.Context, user string, entries []hi
 
 	res, err := coll.BulkWrite(ctx, models, opts)
 	if err != nil {
-		return 0, err
+		return 0, errors.New("Failed to Bulk write entries")
 	}
 	return (res.InsertedCount + res.UpsertedCount + res.ModifiedCount), nil
 }
@@ -97,14 +100,20 @@ func (s *MongoStore) StoreEntries(ctx context.Context, user string, entries []hi
 // PutUser stores the user in the databse
 func (s *MongoStore) PutUser(ctx context.Context, u *User) error {
 	coll := s.client.Database(database).Collection(collectionUsers)
-	_, err := coll.InsertOne(ctx, u, nil)
+	if coll == nil {
+		return errors.New("Could not get collection")
+	}
+	_, err := coll.InsertOne(ctx, *u)
 	return err
 }
 
 // GetUser retrieves a user from the database
 func (s *MongoStore) GetUser(ctx context.Context, user string) (*User, error) {
 	coll := s.client.Database(database).Collection(collectionUsers)
-	res := coll.FindOne(ctx, SelectForUserFilter(user), nil)
+	if coll == nil {
+		return nil, errors.New("Could not get collection")
+	}
+	res := coll.FindOne(ctx, SelectForUserFilter(user))
 	if res.Err() != nil {
 		return nil, res.Err()
 	}

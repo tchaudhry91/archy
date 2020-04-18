@@ -26,10 +26,10 @@ var registerCmd = &cobra.Command{
 
 		err = c.Register(req)
 		if err != nil {
-			fmt.Printf("Could not register: %v", err)
+			fmt.Printf("Could not register: %v\n", err)
 			return
 		}
-		fmt.Printf("Succesfully Registered! Please login to get the token")
+		fmt.Printf("Succesfully Registered! Please login to get the token\n")
 	},
 }
 

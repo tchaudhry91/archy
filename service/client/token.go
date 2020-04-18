@@ -12,7 +12,7 @@ import (
 // Login logs into the service and retrieves the token for subsequent use
 func (c *HistoryClient) Login(req LoginRequest) (tokenStr string, err error) {
 	url := c.remoteURL
-	url.Path = path.Join(url.Path, "login")
+	url.Path = path.Join(url.Path, "token")
 
 	// Build Request
 	data, err := json.Marshal(&req)

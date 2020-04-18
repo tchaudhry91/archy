@@ -35,8 +35,8 @@ func (s *MongoStore) EnsureHistoryIndices(ctx context.Context, recreate bool) er
 		model := mongo.IndexModel{
 			Keys: bson.M{
 				"user":      1,
-				"timestamp": -1,
-				"command":   -2,
+				"timestamp": 1,
+				"command":   1,
 			},
 			Options: &unique,
 		}

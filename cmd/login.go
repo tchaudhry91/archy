@@ -27,15 +27,15 @@ var loginCmd = &cobra.Command{
 
 		token, err = c.Login(req)
 		if err != nil {
-			fmt.Printf("Could not login: %v", err)
+			fmt.Printf("Could not login: %v\n", err)
 			return
 		}
-		fmt.Printf("Succesfully Logged In\n Token:%s", token)
+		fmt.Printf("Succesfully Logged In\n Token:%s\n", token)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(loginCmd)
-	registerCmd.PersistentFlags().StringVar(&loginU, "user", "", "Username")
-	registerCmd.PersistentFlags().StringVar(&loginP, "password", "", "Password")
+	loginCmd.PersistentFlags().StringVar(&loginU, "user", "", "Username")
+	loginCmd.PersistentFlags().StringVar(&loginP, "password", "", "Password")
 }

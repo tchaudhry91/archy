@@ -9,6 +9,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+type key string
+
+const userK key = "user"
+
 func (s *Server) log(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		defer func(begin time.Time) {
@@ -34,10 +38,6 @@ func (s *Server) loggedIn(h http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			type key string
-			var userK key
-			userK = "user"
-
 			user, ok := claims["user"]
 			if !ok {
 				s.respond(w, req, nil, http.StatusUnauthorized, err)

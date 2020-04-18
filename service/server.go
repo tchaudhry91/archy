@@ -79,7 +79,7 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 			Err     string          `json:"err,omitempty"`
 		}
 
-		userV := req.Context().Value("user")
+		userV := req.Context().Value(userK)
 		if userV == nil {
 			s.respond(w, req, nil, http.StatusUnauthorized, errors.New("No user found"))
 			return
@@ -141,7 +141,7 @@ func (s *Server) handlePutEntries() http.HandlerFunc {
 		}
 		r := Request{}
 
-		userV := req.Context().Value("user")
+		userV := req.Context().Value(userK)
 		if userV == nil {
 			s.respond(w, req, nil, http.StatusUnauthorized, errors.New("No user supplied"))
 			return
