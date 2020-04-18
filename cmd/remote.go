@@ -41,6 +41,4 @@ var remoteCmd = &cobra.Command{
 
 func init() {
 	exportCmd.AddCommand(remoteCmd)
-
-	exportCmd.PersistentFlags().StringVar(&remoteAddr, "remote", "https://archy.tux-sudo.com", "Address of the remote service to contact")
 }

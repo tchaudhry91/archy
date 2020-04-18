@@ -8,8 +8,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// EnsureIndices makes sure the required indices exist on the database
-func (s *MongoStore) EnsureIndices(ctx context.Context, recreate bool) error {
+// EnsureHistoryIndices makes sure the required indices exist on the database
+func (s *MongoStore) EnsureHistoryIndices(ctx context.Context, recreate bool) error {
 	err := s.client.Ping(ctx, nil)
 	if err != nil {
 		return errors.Wrap(err, "unable to communicate with database")
@@ -44,6 +44,39 @@ func (s *MongoStore) EnsureIndices(ctx context.Context, recreate bool) error {
 		_, err = iv.CreateOne(ctx, model, nil)
 		if err != nil {
 			return errors.Wrap(err, "failed to create unique-timestamp-command index")
+		}
+	}
+	return nil
+}
+
+// EnsureUserIndices makes sure usernames are unique
+func (s *MongoStore) EnsureUserIndices(ctx context.Context, recreate bool) error {
+	col := s.client.Database(database).Collection(collectionUsers)
+	iv := col.Indexes()
+
+	// Unique user
+	found, err := s.checkIndex(ctx, &iv, "unique-username")
+	if err != nil {
+		return errors.Wrap(err, "unable to check for existence of index")
+	}
+	if !found || recreate {
+		if recreate && found {
+			_, err := iv.DropOne(ctx, "unique-username", nil)
+			if err != nil {
+				return err
+			}
+		}
+		// Create Unique Timestamp Command
+		unique := *options.Index().SetUnique(true).SetName("unique-username")
+		model := mongo.IndexModel{
+			Keys: bson.M{
+				"user": 1,
+			},
+			Options: &unique,
+		}
+		_, err = iv.CreateOne(ctx, model, nil)
+		if err != nil {
+			return errors.Wrap(err, "unique-username")
 		}
 	}
 	return nil

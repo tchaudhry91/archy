@@ -52,7 +52,8 @@ func (s *Server) Shutdown() error {
 	return s.httpS.Shutdown(context.TODO())
 }
 
-func (s *Server) respond(w http.ResponseWriter, req *http.Request, data interface{}, status int) {
+func (s *Server) respond(w http.ResponseWriter, req *http.Request, data interface{}, status int, err error) {
+	defer s.logger.Log("status", status, "err", err)
 	w.WriteHeader(status)
 	if data != nil {
 		err := json.NewEncoder(w).Encode(data)
@@ -78,7 +79,13 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 			Err     string          `json:"err,omitempty"`
 		}
 
-		user := "tchaudhry"
+		userV := req.Context().Value("user")
+		if userV == nil {
+			s.respond(w, req, nil, http.StatusUnauthorized, errors.New("No user found"))
+			return
+		}
+
+		user := userV.(string)
 
 		r := Request{
 			Start: uint64(time.Now().AddDate(0, 0, -7).Unix()),
@@ -90,7 +97,7 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 		if startS, ok := qparams["start"]; ok {
 			start, err := strconv.Atoi(startS[0])
 			if err != nil {
-				s.respond(w, req, nil, http.StatusBadGateway)
+				s.respond(w, req, nil, http.StatusBadRequest, errors.New("Invalid parameter"))
 				return
 			}
 			r.Start = uint64(start)
@@ -98,7 +105,7 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 		if endS, ok := qparams["end"]; ok {
 			end, err := strconv.Atoi(endS[0])
 			if err != nil {
-				s.respond(w, req, nil, http.StatusBadGateway)
+				s.respond(w, req, nil, http.StatusBadRequest, errors.New("Invalid parameter"))
 				return
 			}
 			r.End = uint64(end)
@@ -106,7 +113,7 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 		if limitS, ok := qparams["limit"]; ok {
 			limit, err := strconv.Atoi(limitS[0])
 			if err != nil {
-				s.respond(w, req, nil, http.StatusBadGateway)
+				s.respond(w, req, nil, http.StatusBadRequest, errors.New("Invalid parameter"))
 				return
 			}
 			r.Limit = int64(limit)
@@ -115,10 +122,10 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 		// Fetch the entries
 		entries, err := s.db.GetEntries(req.Context(), user, store.SelectTimerangeFilter(r.Start, r.End), r.Limit)
 		if err != nil {
-			s.respond(w, req, Response{Err: err.Error()}, http.StatusInternalServerError)
+			s.respond(w, req, Response{Err: err.Error()}, http.StatusInternalServerError, err)
 			return
 		}
-		s.respond(w, req, Response{Entries: entries}, http.StatusOK)
+		s.respond(w, req, Response{Entries: entries}, http.StatusOK, nil)
 		return
 	}
 }
@@ -133,19 +140,99 @@ func (s *Server) handlePutEntries() http.HandlerFunc {
 			Err     string `json:"err,omitempty"`
 		}
 		r := Request{}
-		user := "tchaudhry"
+
+		userV := req.Context().Value("user")
+		if userV == nil {
+			s.respond(w, req, nil, http.StatusUnauthorized, errors.New("No user supplied"))
+			return
+		}
+
+		user := userV.(string)
 
 		// Decode Request
-		s.jsonDecode(w, req, &r)
+		err := s.jsonDecode(w, req, &r)
+		if err != nil {
+			s.respond(w, req, Response{Err: err.Error()}, http.StatusBadRequest, err)
+			return
+		}
 
 		// PutEntries
 		changed, err := s.db.StoreEntries(req.Context(), user, r.Entries)
 		if err != nil {
-			s.respond(w, req, Response{Err: err.Error()}, http.StatusInternalServerError)
+			s.respond(w, req, Response{Err: err.Error()}, http.StatusInternalServerError, err)
 			return
 		}
 
-		s.respond(w, req, Response{Updated: changed}, http.StatusOK)
+		s.respond(w, req, Response{Updated: changed}, http.StatusOK, nil)
 		return
+	}
+}
+
+func (s *Server) handleRegister() http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		type Request struct {
+			User     string `json:"user,omitempty"`
+			Password string `json:"password,omitempty"`
+		}
+		type Response struct {
+			Err string `json:"err,omitempty"`
+		}
+		r := Request{}
+
+		err := s.jsonDecode(w, req, &r)
+		if err != nil {
+			s.respond(w, req, Response{Err: err.Error()}, http.StatusBadRequest, err)
+			return
+		}
+
+		user, err := store.NewUser(r.User, r.Password)
+		if err != nil {
+			s.respond(w, req, Response{Err: err.Error()}, http.StatusInternalServerError, err)
+			return
+		}
+
+		// Register the user
+		err = s.db.PutUser(req.Context(), user)
+		if err != nil {
+			s.respond(w, req, Response{Err: err.Error()}, http.StatusInternalServerError, err)
+			return
+		}
+
+		s.respond(w, req, Response{}, http.StatusOK, err)
+	}
+}
+
+func (s *Server) handleGetToken() http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		type Request struct {
+			User     string `json:"user,omitempty"`
+			Password string `json:"password,omitempty"`
+		}
+		type Response struct {
+			Token string `json:"token,omitempty"`
+			Err   string `json:"err,omitempty"`
+		}
+
+		r := Request{}
+
+		err := s.jsonDecode(w, req, &r)
+		if err != nil {
+			s.respond(w, req, Response{Err: err.Error()}, http.StatusBadRequest, err)
+			return
+		}
+
+		user, err := s.db.GetUser(req.Context(), r.User)
+		if err != nil {
+			s.respond(w, req, Response{Err: err.Error()}, http.StatusInternalServerError, err)
+			return
+		}
+		if !user.CheckPassword(r.Password) {
+			s.respond(w, req, Response{Err: "Incorrect password"}, http.StatusUnauthorized, errors.New("Incorrect password"))
+		}
+		token, err := s.buildToken(user.User)
+		if err != nil {
+			s.respond(w, req, Response{Err: "Failed to build token"}, http.StatusInternalServerError, err)
+		}
+		s.respond(w, req, Response{Token: token}, http.StatusOK, nil)
 	}
 }

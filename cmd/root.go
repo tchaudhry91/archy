@@ -51,10 +51,12 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&baseHistoryFile, "baseHistoryFile", filepath.Join(home, ".zsh_history"), "base history file to operate on")
 	rootCmd.PersistentFlags().StringVar(&hostname, "hostname", host, "Override the hostname value for entries from this machine")
 	rootCmd.PersistentFlags().StringVar(&token, "token", "", "the token to communicate with the remote service")
+	rootCmd.PersistentFlags().StringVar(&remoteAddr, "remote", "https://archy.tux-sudo.com", "Address of the remote service to contact")
 
 	viper.BindPFlag("token", rootCmd.Flags().Lookup("token"))
 	viper.BindPFlag("baseHistoryFile", rootCmd.Flags().Lookup("baseHistoryFile"))
 	viper.BindPFlag("hostname", rootCmd.Flags().Lookup("hostname"))
+	viper.BindPFlag("remote", rootCmd.Flags().Lookup("remote"))
 
 }
 

@@ -35,7 +35,7 @@ func (c *HistoryClient) PutEntries(req PutEntriesRequest) (updated int64, err er
 	if resp.StatusCode != http.StatusOK {
 		return 0, errors.Errorf("Failed with status:%d", resp.StatusCode)
 	}
-	response := PutEntriesResponse{}
+	response := putEntriesResponse{}
 	err = decodeResponse(resp.Body, &response)
 	if err != nil {
 		return 0, err
@@ -53,7 +53,7 @@ type PutEntriesRequest struct {
 }
 
 // PutEntriesResponse contains the response for PutEntries
-type PutEntriesResponse struct {
+type putEntriesResponse struct {
 	Updated int64  `json:"updated,omitempty"`
 	Err     string `json:"err,omitempty"`
 }

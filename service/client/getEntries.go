@@ -29,7 +29,7 @@ func (c *HistoryClient) GetEntries(req GetEntriesRequest) ([]history.Entry, erro
 	c.attachHeaders(r)
 
 	// Decode Response
-	response := GetEntriesResponse{}
+	response := getEntriesResponse{}
 	resp, err := c.client.Do(r)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ type GetEntriesRequest struct {
 }
 
 // GetEntriesResponse is the struct to unmarshal JSON output from the server
-type GetEntriesResponse struct {
+type getEntriesResponse struct {
 	Entries []history.Entry `json:"entries,omitempty"`
 	Err     string          `json:"err,omitempty"`
 }

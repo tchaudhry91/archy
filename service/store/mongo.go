@@ -12,6 +12,7 @@ import (
 )
 
 const collection = "entries"
+const collectionUsers = "users"
 const database = "history"
 
 // MongoStore is a struct to represent MongoDB for history entries
@@ -36,7 +37,18 @@ func NewMongoStore(uri string) (ms *MongoStore, err error) {
 		return ms, err
 	}
 
-	return &MongoStore{client}, nil
+	st := &MongoStore{client}
+	err = st.EnsureHistoryIndices(ctx, false)
+	if err != nil {
+		return st, err
+	}
+
+	err = st.EnsureUserIndices(ctx, false)
+	if err != nil {
+		return st, err
+	}
+
+	return st, nil
 }
 
 // GetEntries is used to obtain entries based on filters
@@ -80,4 +92,23 @@ func (s *MongoStore) StoreEntries(ctx context.Context, user string, entries []hi
 		return 0, err
 	}
 	return (res.InsertedCount + res.UpsertedCount + res.ModifiedCount), nil
+}
+
+// PutUser stores the user in the databse
+func (s *MongoStore) PutUser(ctx context.Context, u *User) error {
+	coll := s.client.Database(database).Collection(collectionUsers)
+	_, err := coll.InsertOne(ctx, u, nil)
+	return err
+}
+
+// GetUser retrieves a user from the database
+func (s *MongoStore) GetUser(ctx context.Context, user string) (*User, error) {
+	coll := s.client.Database(database).Collection(collectionUsers)
+	res := coll.FindOne(ctx, SelectForUserFilter(user), nil)
+	if res.Err() != nil {
+		return nil, res.Err()
+	}
+	u := User{}
+	err := res.Decode(&u)
+	return &u, err
 }

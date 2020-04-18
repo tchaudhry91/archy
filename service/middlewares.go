@@ -29,8 +29,7 @@ func (s *Server) loggedIn(h http.HandlerFunc) http.HandlerFunc {
 			return s.signingSecret, nil
 		})
 		if err != nil {
-			s.logger.Log("err", err)
-			s.respond(w, req, nil, http.StatusUnauthorized)
+			s.respond(w, req, nil, http.StatusUnauthorized, err)
 			return
 		}
 
@@ -41,16 +40,14 @@ func (s *Server) loggedIn(h http.HandlerFunc) http.HandlerFunc {
 
 			user, ok := claims["user"]
 			if !ok {
-				s.logger.Log("err", err)
-				s.respond(w, req, nil, http.StatusUnauthorized)
+				s.respond(w, req, nil, http.StatusUnauthorized, err)
 				return
 			}
 			ctx := context.WithValue(req.Context(), userK, user.(string))
 			req = req.WithContext(ctx)
 			h(w, req)
 		} else {
-			s.logger.Log("err", errors.Errorf("User not found in token claims"))
-			s.respond(w, req, nil, http.StatusUnauthorized)
+			s.respond(w, req, nil, http.StatusUnauthorized, errors.New("User not found in token claims"))
 			return
 		}
 	}
