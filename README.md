@@ -1,6 +1,8 @@
 ZSH Archaeologist
 =================
 
+![CI](https://github.com/tchaudhry91/zsh-archaeologist/workflows/CI/badge.svg)
+
 Simple tool to operate on ZSH_HISTORY files. Grab the CLI for your system from the releases.
 
 ```
