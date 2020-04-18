@@ -15,6 +15,7 @@ var cfgFile string
 var baseHistoryFile string
 var token string
 var hostname string
+var remoteAddr string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -53,11 +54,10 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&token, "token", "", "the token to communicate with the remote service")
 	rootCmd.PersistentFlags().StringVar(&remoteAddr, "remote", "https://archy.tux-sudo.com", "Address of the remote service to contact")
 
-	viper.BindPFlag("token", rootCmd.Flags().Lookup("token"))
-	viper.BindPFlag("baseHistoryFile", rootCmd.Flags().Lookup("baseHistoryFile"))
-	viper.BindPFlag("hostname", rootCmd.Flags().Lookup("hostname"))
-	viper.BindPFlag("remote", rootCmd.Flags().Lookup("remote"))
-
+	viper.BindPFlag("token", rootCmd.PersistentFlags().Lookup("token"))
+	viper.BindPFlag("baseHistoryFile", rootCmd.PersistentFlags().Lookup("baseHistoryFile"))
+	viper.BindPFlag("hostname", rootCmd.PersistentFlags().Lookup("hostname"))
+	viper.BindPFlag("remote", rootCmd.PersistentFlags().Lookup("remote"))
 }
 
 // initConfig reads in config file and ENV variables if set.
