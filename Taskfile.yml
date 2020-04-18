@@ -3,13 +3,17 @@
 version: "2"
 
 tasks:
-  release:
+  build:
     cmds:
       - mkdir release || true
-      - GOARCH=amd64 GOOS=windows go build -o release/archy.exe
-      - GOARCH=amd64 GOOS=linux go build -o release/archy
-      - GOARCH=amd64 GOOS=darwin go build -o release/archy-darwin
-      - GOARCH=amd64 GOOD=linux go build -o release/archy-svc ./cmd/server
-      - GOARCH=amd64 GOOD=windows go build -o release/archy-svc.exe ./cmd/server
-      - GOARCH=amd64 GOOD=darwin go build -o release/archy-svc-darwin ./cmd/server
+      - go build -o release/archy
+      - go build -o release/archy-svc ./cmd/server
     silent: true
+  test:
+    cmds:
+      - go fmt ./...
+      - golangci-lint run
+      - go test -v ./...
+  sonar:
+    cmds:
+      - sonar-scanner -Dsonar.login=$SONAR_TOKEN
