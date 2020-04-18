@@ -12,7 +12,6 @@ tasks:
   test:
     cmds:
       - go fmt ./...
-      - golangci-lint run
       - go test -v ./...
   sonar:
     cmds:
