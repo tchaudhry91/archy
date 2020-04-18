@@ -1,0 +1,33 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: curl -sL https://taskfile.dev/install.sh | sh
+      - run: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s v1.21.0
+      - run: curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh
+      - name: Test
+        run: ./bin/task test
+        env:
+          PATH: $PATH:./bin
+          CGO_ENABLED: 0
+      - name: Build
+        run: ./bin/task build
+        env:
+          CGO_ENABLED: 0
+      - name: Sonar Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release
+        run: ./bin/goreleaser
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
