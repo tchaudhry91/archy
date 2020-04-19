@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var maxEntries int64
@@ -18,5 +17,4 @@ func init() {
 
 	// Flags
 	importCmd.PersistentFlags().Int64Var(&maxEntries, "maxEntries", 10000, "The maximum number of newest entries to write. This may be overridden by your zsh config")
-	viper.BindPFlag("maxEntries", importCmd.Flags().Lookup("maxEntries"))
 }

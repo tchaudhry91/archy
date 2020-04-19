@@ -36,6 +36,17 @@ func ParseFile(location string, machine string) ([]Entry, error) {
 	return ee, errRet
 }
 
+// SliceEntries reduces the slice of entries to only include entries AFTER the given timestamp
+func SliceEntries(lastTS uint64, entries []Entry) []Entry {
+	reduced := []Entry{}
+	for _, e := range entries {
+		if e.Timestamp > lastTS {
+			reduced = append(reduced, e)
+		}
+	}
+	return reduced
+}
+
 // ParseLine parses a single line of text to an Entry Object
 func ParseLine(line string) (Entry, error) {
 	split := strings.Split(line, ";")

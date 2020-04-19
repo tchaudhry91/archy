@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/tchaudhry91/zsh-archaeologist/service/client"
 )
 
@@ -31,6 +32,10 @@ var loginCmd = &cobra.Command{
 			return
 		}
 		fmt.Printf("Succesfully Logged In\n Token:%s\n", token)
+		if err = viper.WriteConfig(); err != nil {
+			fmt.Println("Could not write config back to file:", err)
+		}
+		fmt.Printf("Your token has been updated in your config.")
 	},
 }
 

@@ -55,9 +55,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&remoteAddr, "remote", "https://archy.tux-sudo.com", "Address of the remote service to contact")
 
 	viper.BindPFlag("token", rootCmd.PersistentFlags().Lookup("token"))
-	viper.BindPFlag("baseHistoryFile", rootCmd.PersistentFlags().Lookup("baseHistoryFile"))
-	viper.BindPFlag("hostname", rootCmd.PersistentFlags().Lookup("hostname"))
-	viper.BindPFlag("remote", rootCmd.PersistentFlags().Lookup("remote"))
 }
 
 // initConfig reads in config file and ENV variables if set.
