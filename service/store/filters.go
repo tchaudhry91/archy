@@ -38,6 +38,28 @@ func SelectTillTimestampFilter(ts uint64) bson.D {
 	}
 }
 
+// SelectMachineFilter returns all documents with a machine match
+func SelectMachineFilter(machine string) bson.D {
+	return bson.D{
+		{
+			Key:   "entry.machine",
+			Value: machine,
+		},
+	}
+}
+
+// SearchCommandFilter returns all documents with a regex match of the given string
+func SearchCommandFilter(command string) bson.D {
+	return bson.D{
+		{
+			Key: "entry.command",
+			Value: map[string]string{
+				"$regex": command,
+			},
+		},
+	}
+}
+
 // SelectTimerangeFilter returns all documents within two timestamps
 func SelectTimerangeFilter(start, end uint64) bson.D {
 	return AndMergeFilters(SelectSinceTimestampFilter(start), SelectTillTimestampFilter(end))

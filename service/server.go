@@ -70,9 +70,11 @@ func (s *Server) jsonDecode(w http.ResponseWriter, req *http.Request, v interfac
 func (s *Server) handleGetEntries() http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		type Request struct {
-			Start uint64 `json:"start,omitempty"`
-			End   uint64 `json:"end,omitempty"`
-			Limit int64  `json:"limit,omitempty"`
+			Start   uint64 `json:"start,omitempty"`
+			End     uint64 `json:"end,omitempty"`
+			Command string `json:"command,omitempty"`
+			Machine string `json:"machine,omitempty"`
+			Limit   int64  `json:"limit,omitempty"`
 		}
 		type Response struct {
 			Entries []history.Entry `json:"entries,omitempty"`
@@ -88,9 +90,11 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 		user := userV.(string)
 
 		r := Request{
-			Start: uint64(time.Now().AddDate(0, 0, -7).Unix()),
-			End:   uint64(time.Now().Unix()),
-			Limit: 100,
+			Start:   uint64(time.Now().AddDate(0, 0, -7).Unix()),
+			End:     uint64(time.Now().Unix()),
+			Machine: "",
+			Command: "",
+			Limit:   100,
 		}
 		// Decode request
 		qparams := req.URL.Query()
@@ -119,8 +123,24 @@ func (s *Server) handleGetEntries() http.HandlerFunc {
 			r.Limit = int64(limit)
 		}
 
+		if machineQ, ok := qparams["machine"]; ok {
+			r.Machine = machineQ[0]
+		}
+
+		if commandQ, ok := qparams["command"]; ok {
+			r.Command = commandQ[0]
+		}
+
+		filter := store.SelectTimerangeFilter(r.Start, r.End)
+		if r.Command != "" {
+			filter = store.AndMergeFilters(filter, store.SearchCommandFilter(r.Command))
+		}
+		if r.Machine != "" {
+			filter = store.AndMergeFilters(filter, store.SelectMachineFilter(r.Machine))
+		}
+
 		// Fetch the entries
-		entries, err := s.db.GetEntries(req.Context(), user, store.SelectTimerangeFilter(r.Start, r.End), r.Limit)
+		entries, err := s.db.GetEntries(req.Context(), user, filter, r.Limit)
 		if err != nil {
 			s.respond(w, req, Response{Err: err.Error()}, http.StatusInternalServerError, err)
 			return

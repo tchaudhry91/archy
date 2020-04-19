@@ -2,6 +2,7 @@ package client
 
 import (
 	"net/http"
+	"net/url"
 	"path"
 	"strconv"
 
@@ -11,16 +12,25 @@ import (
 
 // GetEntries fetches history events from the server
 func (c *HistoryClient) GetEntries(req GetEntriesRequest) ([]history.Entry, error) {
-	url := c.remoteURL
-	url.Path = path.Join(url.Path, getEntriesPath)
+	uri := c.remoteURL
+	uri.Path = path.Join(uri.Path, getEntriesPath)
 
+	q := uri.Query()
 	// Encode Values
-	url.Query().Add("start", strconv.Itoa(int(req.Start)))
-	url.Query().Add("end", strconv.Itoa(int(req.End)))
-	url.Query().Add("limit", strconv.Itoa(int(req.Limit)))
+	q.Add("start", strconv.Itoa(int(req.Start)))
+	q.Add("end", strconv.Itoa(int(req.End)))
+	q.Add("limit", strconv.Itoa(int(req.Limit)))
+	if req.Command != "" {
+		q.Add("command", url.QueryEscape(req.Command))
+	}
+	if req.Machine != "" {
+		q.Add("machine", url.QueryEscape(req.Machine))
+	}
+
+	uri.RawQuery = q.Encode()
 
 	// Build Request
-	r, err := http.NewRequest("GET", url.String(), nil)
+	r, err := http.NewRequest("GET", uri.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -49,9 +59,11 @@ func (c *HistoryClient) GetEntries(req GetEntriesRequest) ([]history.Entry, erro
 
 // GetEntriesRequest contains the request params to query for history entries
 type GetEntriesRequest struct {
-	Start uint64
-	End   uint64
-	Limit int64
+	Start   uint64
+	End     uint64
+	Limit   int64
+	Machine string
+	Command string
 }
 
 // GetEntriesResponse is the struct to unmarshal JSON output from the server
