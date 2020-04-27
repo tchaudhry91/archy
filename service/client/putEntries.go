@@ -7,7 +7,7 @@ import (
 	"path"
 
 	"github.com/pkg/errors"
-	"github.com/tchaudhry91/zsh-archaeologist/history"
+	"github.com/tchaudhry91/archy/history"
 )
 
 // PutEntries sends the history events to the server

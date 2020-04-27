@@ -8,9 +8,9 @@ import (
 	"syscall"
 
 	"github.com/gorilla/mux"
-	"github.com/tchaudhry91/zsh-archaeologist/service"
+	"github.com/tchaudhry91/archy/service"
 
-	"github.com/tchaudhry91/zsh-archaeologist/service/store"
+	"github.com/tchaudhry91/archy/service/store"
 
 	"github.com/go-kit/kit/log"
 

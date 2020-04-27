@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/tchaudhry91/zsh-archaeologist/history"
+	"github.com/tchaudhry91/archy/history"
 )
 
 // localCmd represents the local command

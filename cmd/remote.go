@@ -3,11 +3,11 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/tchaudhry91/zsh-archaeologist/service/client"
+	"github.com/tchaudhry91/archy/service/client"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tchaudhry91/zsh-archaeologist/history"
+	"github.com/tchaudhry91/archy/history"
 )
 
 // remoteCmd represents the remote command

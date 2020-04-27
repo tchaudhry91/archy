@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/tchaudhry91/zsh-archaeologist/history"
+	"github.com/tchaudhry91/archy/history"
 )
 
 func getSampleEntries() ([]history.Entry, error) {

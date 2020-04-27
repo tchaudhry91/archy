@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-	"github.com/tchaudhry91/zsh-archaeologist/history"
+	"github.com/tchaudhry91/archy/history"
 )
 
 // GetEntries fetches history events from the server

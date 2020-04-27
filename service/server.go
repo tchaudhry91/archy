@@ -12,9 +12,9 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
 
-	"github.com/tchaudhry91/zsh-archaeologist/history"
+	"github.com/tchaudhry91/archy/history"
 
-	"github.com/tchaudhry91/zsh-archaeologist/service/store"
+	"github.com/tchaudhry91/archy/service/store"
 )
 
 // Server is the base struct for the HTTP history service

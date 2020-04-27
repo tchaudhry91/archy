@@ -1,4 +1,4 @@
-module github.com/tchaudhry91/zsh-archaeologist
+module github.com/tchaudhry91/archy
 
 go 1.14
 

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tchaudhry91/zsh-archaeologist/service/client"
+	"github.com/tchaudhry91/archy/service/client"
 )
 
 var machine string

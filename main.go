@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/tchaudhry91/zsh-archaeologist/cmd"
+import "github.com/tchaudhry91/archy/cmd"
 
 func main() {
 	cmd.Execute()
