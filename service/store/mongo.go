@@ -27,7 +27,7 @@ func NewMongoStore(uri string) (ms *MongoStore, err error) {
 	if err != nil {
 		return ms, err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	if err = client.Connect(ctx); err != nil {
